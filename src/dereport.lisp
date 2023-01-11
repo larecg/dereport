@@ -1,25 +1,4 @@
-(defpackage :dereport
-  (:import-from :cl-ppcre :regex-replace-all)
-  (:import-from :str :replace-first)
-  (:import-from :alexandria :if-let)
-  (:import-from :arrow-macros -<> <>)
-  (:use :cl)
-  (:export
-   :main))
-
 (in-package :dereport)
-
-(opts:define-opts
-    (:name :help
-           :description "print this help"
-           :short #\h
-           :long "help")
-    (:name :input
-           :description "Read from file"
-           :short #\i
-           :long "input"
-           :arg-parser #'identity
-           :meta-var "FILE"))
 
 (defvar *prefixes-per-category* '(("Done" . ("- [X]" "- [x]" "*** DONE" "*** WAITING" "*** DELEGATED"))
                      ("Discarded" . ("*** CANCELLED" "*** FORWARDED"))
@@ -55,20 +34,6 @@
   "Print the TASKS grouped by the CATEGORY"
   (format t "~&~a:~&~{~a~&~}~%" category (sort tasks #'shorter-p)))
 
-(defun handle-arg-condition (condition)
-  "Return information when there was a problem parsing the arguments"
-  (format t "Problem while parsing option ~s: ~a .~%" (opts:option condition) condition)
-  (opts:describe))
-
-(defun get-cli-arguments ()
-  "Gets arguments when CLI is called"
-  (multiple-value-bind (arguments)
-      (handler-bind ((opts:unknown-option #'handle-arg-condition)
-                     (opts:arg-parser-failed #'handle-arg-condition)
-                     (opts:missing-arg #'handle-arg-condition))
-         (opts:get-opts))
-    arguments))
-
 (defun get-tasks-per-category-from-stream (&optional (stream *standard-input*))
   (let ((tasks-per-category (make-hash-table :test #'equal)))
     (loop :for line = (read-line stream nil :eof)
@@ -80,12 +45,3 @@
                                 (gethash category tasks-per-category) :test #'equal)))))
     (maphash #'print-tasks-per-category tasks-per-category)
     tasks-per-category))
-
-(defun main ()
-  (let ((arguments (get-cli-arguments)))
-    (if (getf arguments :help)
-        (opts:describe)
-        (if-let (input-file (uiop:file-exists-p (getf arguments :input)))
-          (with-open-file (stream input-file)
-            (get-tasks-per-category-from-stream stream))
-          (get-tasks-per-category-from-stream)))))

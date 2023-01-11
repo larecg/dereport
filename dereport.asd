@@ -13,4 +13,6 @@
   :serial t
   :components ((:module "src"
                 :components
-                ((:file "dereport")))))
+                ((:file "package")
+                 (:file "dereport")
+                 (:file "cli")))))
