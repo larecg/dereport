@@ -9,7 +9,7 @@
 Download project in the `~/common-lisp` folder
 
 ```sh
-git clone git@github.com:larecg/utils.git ~/common-lisp/utils
+git clone git@github.com:larecg/dereport.git ~/common-lisp/dereport
 ```
 
 Install dependencies using [roswell](https://roswell.github.io)
