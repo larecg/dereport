@@ -8,6 +8,7 @@
   :license "LLGPL"
   :depends-on ("str"
                "cl-ppcre"
+               "unix-opts"
                "arrow-macros")
   :serial t
   :components ((:module "src"
