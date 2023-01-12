@@ -7,6 +7,7 @@
   :description "Daily Report Utility"
   :license "LLGPL"
   :depends-on ("str"
+               "log4cl"
                "cl-ppcre"
                "unix-opts"
                "arrow-macros")
@@ -14,5 +15,6 @@
   :components ((:module "src"
                 :components
                 ((:file "package")
+                 (:file "utils")
                  (:file "dereport")
                  (:file "cli")))))

@@ -27,6 +27,7 @@
     arguments))
 
 (defun main ()
+  (load-init-file #P"~/.config/dereport/cli.lisp")
   (let ((arguments (get-cli-arguments)))
     (if (getf arguments :help)
         (opts:describe)

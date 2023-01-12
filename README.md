@@ -42,6 +42,19 @@ The new binary is ready:
 ./dereport
 ```
 
+## Config file
+
+Optionally, to change the options, you can configure the file: `~/.config/dereport/cli.lisp`
+
+```lisp
+(in-package :dereport)
+
+(setf *prefixes-per-category* '(("Done" . ("*** DONE" "*** WAITING" "*** DELEGATED"))
+                     ("Discarded" . ("*** CANCELLED" "*** FORWARDED"))
+                     ("Doing" . ("*** DOING"))
+                     ("Next" . ("*** TODO" "*** NEXT"))))
+```
+
 ## License
 
 Licensed under the LLGPL License.
