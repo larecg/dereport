@@ -1,18 +1,21 @@
 (in-package :dereport)
 
-(defvar *prefixes-per-category* '(("Done" . ("- [X]" "- [x]" "*** DONE" "*** WAITING" "*** DELEGATED"))
-                     ("Discarded" . ("*** CANCELLED" "*** FORWARDED"))
-                     ("Doing" . ("- [-]" "- [o]" "*** DOING"))
-                     ("Next" . ("- [ ]" "*** TODO" "*** NEXT")))
+(defvar *prefixes-per-category* '(("Done" . ("- [x]"))
+                     ("Doing" . ("- [-]"))
+                     ("Next" . ("- [ ]")))
   "Association List with the group and the list of patterns to group them")
 
+(defvar *regex-replacements* '(("\\[(\\w+)\\]\\(\\w+\\)" . "\\1")) ; Markdown links
+  "List of Regex replacements")
+
 (defun sanitize-task (task prefix)
-  (-<> task
+  "Clean the TASK and return it without unnecesary context, removing the PREFIX"
+  (-<>> task
     (str:trim)
-    (replace-first prefix "-" <>) ; Homologate prefix
-    (regex-replace-all " :[\\w:]+:$" <> "") ; Remove org-mode tags
-    (regex-replace-all "\\[(\\w+)\\]\\(\\w+\\)" <> "\\1") ; Markdown links
-    (regex-replace-all "\\[\\[(\\w+)\\]\\[(\\w+)]\\]" <> "\\2"))) ; Org-mode links
+    (replace-first prefix "-") ; Homologate prefix
+    (do ((replacement-list *regex-replacements* (cdr replacement-list))
+         (sanitized-task <> (regex-replace-all (caar replacement-list) sanitized-task (cdar replacement-list))))
+        ((null replacement-list) sanitized-task))))
 
 (defun get-valid-prefix (task prefixes)
   "Returns the prefix that applies to the given TASK"
@@ -27,14 +30,13 @@
         :when prefix
         :return (values category prefix)))
 
-(defun shorter-p (a b)
-  (< (length a) (length b)))
-
 (defun print-tasks-per-category (category tasks)
   "Print the TASKS grouped by the CATEGORY"
-  (format t "~&~a:~&~{~a~&~}~%" category (sort tasks #'shorter-p)))
+  (labels ((less-p (a b) (< (length a) (length b))))
+    (format t "~&~a:~&~{~a~&~}~%" category (sort tasks #'less-p))))
 
 (defun get-tasks-per-category-from-stream (&optional (stream *standard-input*))
+  "Split tasks per category from the given STREAM or the STDIN"
   (let ((tasks-per-category (make-hash-table :test #'equal)))
     (loop :for line = (read-line stream nil :eof)
           :until (eq line :eof)

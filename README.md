@@ -53,6 +53,9 @@ Optionally, to change the options, you can configure the file: `~/.config/derepo
                      ("Discarded" . ("*** CANCELLED" "*** FORWARDED"))
                      ("Doing" . ("*** DOING"))
                      ("Next" . ("*** TODO" "*** NEXT"))))
+
+(setf *regex-replacements* '((" :[\\w:]+:$" . "") ; Org-mode tags
+                             ("\\[\\[(\\w+)\\]\\[(\\w+)]\\]" . "\\2"))) ; Org-mode links
 ```
 
 ## License
