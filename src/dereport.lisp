@@ -42,8 +42,9 @@
           :until (eq line :eof)
           :do (multiple-value-bind (category prefix) (identify-category-prefix line)
                 (when category
-                  (setf (gethash category tasks-per-category)
-                        (adjoin (sanitize-task line prefix)
-                                (gethash category tasks-per-category) :test #'equal)))))
+                  (let ((sanitized-task (sanitize-task line prefix))
+                        (processed-tasks (gethash category tasks-per-category)))
+                    (setf (gethash category tasks-per-category)
+                          (adjoin sanitized-task processed-tasks :test #'equal))))))
     (maphash #'print-tasks-per-category tasks-per-category)
     tasks-per-category))
