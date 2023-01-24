@@ -14,7 +14,7 @@
     (str:trim)
     (replace-first prefix "-") ; Homologate prefix
     (do ((replacement-list *regex-replacements* (cdr replacement-list))
-         (sanitized-task <> (regex-replace-all (caar replacement-list) sanitized-task (cdar replacement-list))))
+         (sanitized-task <> (str:trim (regex-replace-all (caar replacement-list) sanitized-task (cdar replacement-list)))))
         ((null replacement-list) sanitized-task))))
 
 (defun get-valid-prefix (task prefixes)
